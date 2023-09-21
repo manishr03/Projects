@@ -1,0 +1,181 @@
+---
+title: "STA108 Final Project"
+author: "Manish Rathor"
+date: "6/12/2023"
+output: pdf_document
+---
+
+```{r}
+# I will use these packages to calculate/visualize relevant values 
+library(dplyr)
+library(ggplot2)
+library(GGally)
+getwd()
+```
+
+```{r}
+#reading the data into RStudio and naming the columns
+demographic <- read.table("/Users/manishrathor/Documents/School /Davis /2022-23/SQ2023/STA108 /Data/demographic.txt")
+names(demographic) <- c("ID", "County", "State", "LandArea", "TotalPopulation", "PercPop18-34", "PercPop65+", "Physicians", "HospitalBeds", "SeriousCrimes", "PercentHSGrads", "PercentBachDegree", "PercentBelowPoverty", "PercentUnemployment", "PerCapitaIncome", "TotalPersonalIncome", "GeoRegion" )
+head(demographic)
+```
+
+```{r}
+crimedata <- demographic[,10]
+boxplot(crimedata)
+```
+
+
+# Part 1: Creating the Regression Model
+
+```{r}
+#creating a new data frame that only contains counties in geographic region 4
+demographic4 <- filter(demographic, GeoRegion == "4")
+head(demographic4)
+```
+
+```{r}
+#creating a data frame that contains only the variables used in the regression model 
+crimemodeldata <- demographic4[,c(5,15,10)]
+head(crimemodeldata)
+```
+
+```{r}
+#visualizing/calculating the correlation between the variables 
+ggpairs(crimemodeldata)
+```
+I chose the Total Population and Per Capita Income as the predictor variables because they are relatively highly correlated with the Total Number of Serious Crimes (Y). 
+
+Neither of the predictor variables are highly correlated with each other, so we do not need to be concerned about multicollinearity. 
+
+```{r}
+crimemodel <- lm(SeriousCrimes ~ TotalPopulation + PerCapitaIncome, crimemodeldata)
+crimemodel
+```
+The regression model is: $$\hat{Y} = 3804.83220 + 0.07741X_1 - 0.46867X_2$$
+
+$\beta_0$ is the y-intercept. 
+
+$\beta_1$ represents the rate of change of the predicted number of total serious crimes based on the change in the total population (when the per capita income is held constant).
+
+$\beta_2$ represents the rate of change of the predicted number of total serious crimes based on the change in per capita income (when the total population is held constant).
+
+# Part 2: 90% Confidence Interval for B_j (j = 1,2)
+
+```{r}
+#This function allows us to create confidence intervals for each parameter in the model
+confint(crimemodel, level = 0.9)
+```
+
+We are 90% confident that the true value of $\beta_1$ lies within the interval $(0.07573344,0.07907676)$. 
+
+We are 90% confident that the true value of $\beta_2$ lies within the interval $(-0.8918714,-0.04547556)$.
+
+# Part 3: P-Value of Hypothesis Test for Regression Relation at alpha = 0.01
+
+***Alternatives***
+
+$H_0$: There is no regression relation. $\beta_1 = \beta_2 = 0$
+
+$H_a$: There is a regression relation. Not all $\beta_j = 0$, $(j = 1,2)$
+
+***Decision Rule***
+
+If the p-value > $\alpha$, conclude $H_0$
+
+If the p-value < $\alpha$, conclude $H_a$
+
+***Conclusion***
+
+```{r}
+#We can use the ANOVA table to find the p-value 
+anova(crimemodel)
+```
+The p-value = $(2 \times 10^{-16}) + (0.06908) = 0.06908$ 
+
+
+$0.06908 > 0.01$. Because the p-value > $\alpha$, we cannot reject the null hypothesis and must conclude $H_0$. At the $\alpha = 0.01$ level, there is no regression relation, therefore all $\beta_j = 0$. However, it is important to note that for F-tests, multiple predictor variables are included in the calculations. Because the p-value does not account for interaction effects between predictor variables, it should not be used as the sole value to make conclusions. 
+
+# Part 4: Hypothesis Test for Regression Relation at alpha = 0.05 + Adjusted R-Squared
+
+To test for regression relation, we will use an F-Test because it allows us to account for the interaction effects among the predictor variables. 
+
+***Alternatives***
+
+$H_0$: There is no regression relation. $\beta_1 = \beta_2 = 0$
+
+$H_a$: There is a regression relation. Not all $\beta_j = 0$ $(j = 1,2)$
+
+***Decision Rule***
+
+If $F* \leq F(1-\alpha, p-1, n-p)$, conclude $H_0$
+
+If $F* > F(1-\alpha, p-1, n-p)$, conclude $H_a$
+
+In the F critical value, $\alpha$ represents the significance level, $p$ represents the number of variables in the model, and $n$ represents the number of observations used to create the model. 
+
+In this case, $\alpha = 0.05$, $p = 3$, and $n = 77$.
+
+***Conclusion***
+
+```{r}
+#We can use the summary function to find the F statistic (F*) and the adjusted R^2
+summary(crimemodel)
+```
+$F* = 3078$
+
+```{r}
+#We can use this function to find the F critical value
+qf(0.95,2,74)
+```
+$F(1-0.05, 3-1, 77-3) = F(0.95, 2, 74) = 3.120349$
+
+$3078 > 3.120349$. Because $F* > F(1-\alpha, p-1, n-p)$, we can reject the null hypothesis and conclude $H_a$. This means there is a regression relation and not all $\beta_j$ is equal to 0.  
+
+The $R^2$ value is a value that measures the goodness of fit of a regression model.It indicates the proportion of the variation in the response variable that is explained by the predictor variables. The adjusted $R^2$ value does the same thing, but it accounts for the number of predictor variables as well as the sample size of the data. It does this by avoiding the inclusion of statistically insignificant predictors in its calculations. For this model, the adjusted $R^2 = 0.9878$. This means that 98.78% of the variation in the response variable can be explained by the predictor variables. This is a high value, meaning that there is very little unexplained variation in the response data.
+
+# Part 5: Diagnostic Plots 
+
+```{r}
+residuals <- crimemodel$residuals
+```
+
+
+```{r}
+plot(crimemodel, 1)
+```
+The Residuals vs. Fitted plot is used to check the linear relationship assumption. A horizontal red line is an indicator that the data is linearly related. However, we can see that the red line is not horizontal, and the residuals are clumped together. This means that the relationship may not be linear. Applying a non-linear transformation to the predictors may fix this issue. 
+
+```{r}
+crimemodel2 <- lm(SeriousCrimes ~ log(TotalPopulation) + log(PerCapitaIncome), crimemodeldata)
+plot(crimemodel2, 1)
+```
+As we can see, by applying the transformation "log(x)", the residuals show a much more linear relationship. 
+
+```{r}
+plot(crimemodel, 2)
+```
+The normal Q-Q plot is used to examine whether the residuals are normally distributed. If the residuals remain on the dashed line $(y = x)$, we can conclude that they are normally distributed. We can see that the majority of the residuals lie on the line. However, there are some outliers that do not lie on the plane. 
+
+```{r}
+plot(crimemodel, 3)
+```
+The Scale-Location plot is used to check the homogeneity of the variance. The variance can be considered homogeneous if the points are equally spread out and the red line is approximately horizontal. However, this is not the case in our plot. To try and fix this, we can apply a non-linear transformation to the response variable. 
+
+```{r}
+crimemodel3 <- lm(log(SeriousCrimes) ~ TotalPopulation + PerCapitaIncome, crimemodeldata)
+plot(crimemodel3, 3)
+```
+The application of a log(y) transformation creates more spread among the points and causes the red line to become more linear. However, the data points are still clumped together, and the red line is not horizontal. We will have to conclude that the variance is not homogeneous. 
+
+```{r}
+plot(crimemodel, 5)
+```
+The Residuals vs. Leverage plot checks for outliers. We can see that there are several points that can be considered outliers. Point 1 is an extreme outlier, as it lies outside Cook's Distance. This means that it can be considered a high leverage point, and will skew the results of the regression analysis with its inclusion or exclusion. Therefore, we do not want to simply remove it.
+
+
+
+
+
+
+

@@ -1,2 +1,2 @@
-# Projects
-Hello, this repository serves as a collection of my Machine Learning/Data Science projects. 
+# Generative AI Movie Recommender
+This project is a full-stack application that recommends movies based on user input. Users can input three films, and include a rating for each one, and based on those films + ratings, my application will suggest other movies that they may enjoy. I developed the frontend with React, CSS, and HTML, and I integrated OpenAI's API in the backend to create an effective recommendation algorithm. 

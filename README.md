@@ -1,2 +1,2 @@
-# Projects
-Hello, this repository serves as a collection of my Machine Learning/Data Science projects. 
+# Parkinson's Detection Model
+In this project, I used a Support Vector Machine Classifier to predict whether a patient has Parkinson's disease, based on numerous features.

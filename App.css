@@ -1,18 +1,22 @@
+/* center aligning elements in the app class */
 .App {
   text-align: center;
 }
 
+/* setting logo height and making it decorative */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
+/* adding animation to logo if user hasn't requested reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+/* stylizing the app header */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,10 +28,12 @@
   color: white;
 }
 
+/* setting the color of hyperlinks in the app to light blue */
 .App-link {
   color: #61dafb;
 }
 
+/* animation to make logo continuously rotate */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

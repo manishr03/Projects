@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  // dynamically update movies and user's rating
   const [movies, setMovies] = useState([
     { title: '', rating: 0 },
     { title: '', rating: 0 },
     { title: '', rating: 0 }
   ]);
+  // store recommendations from backend
   const [recommendations, setRecommendations] = useState('');
+  // track whether user has clicked button to generate recommendations
   const [hasClickedRecommend, setHasClickedRecommend] = useState(false);
 
+  // send POST request to fetch movie recommendations
   const handleSubmit = async () => {
+    // tries to run code without errors
     try {
       const response = await fetch('http://localhost:3001/get-recommendations', {
         method: 'POST',
@@ -21,23 +26,27 @@ function App() {
         // body: JSON.stringify({ movies: movies })
         body: JSON.stringify({ movies: movies })
       });
-
+      // changing the earlier variables and sending data to user if request works 
       if (response.ok) {
         const data = await response.json();
         setRecommendations(data.recommendations);
         setHasClickedRecommend(true);
+      // throw an error if the reponse fails
       } else {
         console.error('Failed to retrieve recommendations');
       }
+    // log the error 
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+  // JSX for UI 
   return (
+    // Container
     <div className="App">
       <header className="App-header">
-        <p>Hello AISC!</p>
+        <p>Hello User!</p>
         <form onSubmit={e => e.preventDefault()}>
           {movies.map((movie, index) => (
             <div key={index}>

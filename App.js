@@ -47,18 +47,18 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>Hello User!</p>
-        /* prevent reloads when user submits data */
+        {/* prevent reloads when user submits data */}
         <form onSubmit={e => e.preventDefault()}>
           {movies.map((movie, index) => (
             <div key={index}>
-               /* generate an input field for movie title */
+              {/* generate an input field for movie title */}
               <input 
                 placeholder="Movie title" 
                 value={movie.title}
                 onChange={e => handleInputChange(index, 'title', e.target.value)}
               />
               <div>
-                /* set option for number of stars for user to choose */
+                {/* set option for number of stars for user to choose */}
                 {[1, 2, 3, 4, 5].map(starNumber => (
                   <span
                     key={starNumber}
@@ -71,10 +71,10 @@ function App() {
               </div>
             </div>
           ))}
-          /* button to get recommendations */
+          {/* button to get recommendations */}
           <button onClick={handleSubmit}>Get Recommendations</button>
         </form>
-        /* Returning recommendations when button is clicked */
+        {/* Returning recommendations when button is clicked */}
         {hasClickedRecommend && (
           <div>
             <h2>Based on your preferences, here are some more movie recommendations:</h2>

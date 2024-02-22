@@ -47,15 +47,18 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>Hello User!</p>
+        // prevent reloads when user submits data
         <form onSubmit={e => e.preventDefault()}>
           {movies.map((movie, index) => (
             <div key={index}>
+              // generate an input field for movie title
               <input 
                 placeholder="Movie title" 
                 value={movie.title}
                 onChange={e => handleInputChange(index, 'title', e.target.value)}
               />
               <div>
+                // set option for number of stars for user to choose
                 {[1, 2, 3, 4, 5].map(starNumber => (
                   <span
                     key={starNumber}
@@ -68,9 +71,10 @@ function App() {
               </div>
             </div>
           ))}
+          // button to get recommendations
           <button onClick={handleSubmit}>Get Recommendations</button>
         </form>
-
+        // Returning recommendations when button is clicked 
         {hasClickedRecommend && (
           <div>
             <h2>Based on your preferences, here are some more movie recommendations:</h2>
@@ -80,13 +84,13 @@ function App() {
       </header>
     </div>
   );
-
+  // updates the title of movies in the earlier array 
   function handleInputChange(index, field, value) {
     const newMovies = [...movies];
     newMovies[index][field] = value;
     setMovies(newMovies);
   }
-
+  // updates the rating of a movie when stars are selected 
   function handleStarClick(index, starNumber) {
     handleInputChange(index, 'rating', starNumber);
   }
